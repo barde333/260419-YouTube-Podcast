@@ -1,0 +1,9 @@
+.git
+.env
+data/
+__pycache__/
+*.pyc
+*.db
+*.mp3
+*.log
+.DS_Store

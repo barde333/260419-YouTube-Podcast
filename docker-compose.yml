@@ -1,0 +1,16 @@
+services:
+  podcast:
+    build: .
+    container_name: podcastyt
+    restart: unless-stopped
+    ports:
+      - "192.168.2.64:5000:5000"
+    volumes:
+      - /opt/podcastyt/data:/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
