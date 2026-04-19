@@ -121,8 +121,11 @@ Voir [.env.example](.env.example). Variables principales :
 - Endpoint `/add?url=...&key=...` pour URL handler (iOS Shortcuts + navigateur)
 - Page `/bookmarklet` : instructions drag-and-drop
 
-### ⏳ Étape 10 — Tests de bout en bout
-- Parcours complet : URL YouTube → MP3 → RSS → Pocket Casts
+### ✅ Étape 10 — Tests de bout en bout
+- Parcours complet validé : URL YouTube → yt-dlp → MP3 → SQLite → flux RSS → Pocket Casts iPhone
+- Câblage final du backend (les routes `/feed.rss`, `POST /api/episodes`, `DELETE`, `/add` utilisaient des données mock ; désormais connectées à la DB et au converter)
+- Flux RSS enrichi avec `<itunes:category>` et `<itunes:owner>` (requis par Pocket Casts pour valider l'abonnement)
+- Route `/media/<filename>` ajoutée pour servir les MP3 aux clients podcast
 
 ---
 
