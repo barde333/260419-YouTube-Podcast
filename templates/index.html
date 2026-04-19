@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Podcast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      font-family: 'Caveat', cursive;
+      color: #ccc;
+      padding: 20px;
+    }
+    .container {
+      max-width: 520px;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    /* Header */
+    .header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid #222;
+    }
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .header-subtitle {
+      font-size: 11px;
+      color: #555;
+      font-family: 'Space Mono', monospace;
+      margin-top: 2px;
+    }
+    /* Input row */
+    .input-row {
+      padding: 14px 24px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .url-input {
+      flex: 1;
+      height: 36px;
+      background: #1c1c1c;
+      border: 1.5px solid #333;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #444;
+      outline: none;
+    }
+    .url-input::placeholder {
+      color: #444;
+    }
+    .btn {
+      height: 36px;
+      padding: 0 16px;
+      background: #1a1a1a;
+      border: 2px solid #1a1a1a;
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'Caveat', cursive;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #2a2a2a;
+      border-color: #2a2a2a;
+    }
+    .btn-small {
+      padding: 4px 10px;
+      height: auto;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid #333;
+      color: #666;
+    }
+    .btn-small:hover {
+      color: #888;
+      border-color: #555;
+    }
+    /* Status */
+    .status {
+      padding: 8px 24px;
+      background: #0d1f0d;
+      border-bottom: 1px solid #1a3a1a;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #3aaa3a;
+    }
+    .status.error {
+      background: #1f0d0d;
+      border-bottom-color: #3a1a1a;
+      color: #cc3a3a;
+    }
+    /* Table */
+    .table-header {
+      display: grid;
+      grid-template-columns: 1fr 70px 70px 80px;
+      padding: 8px 24px;
+      border-bottom: 1px solid #222;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #444;
+      text-transform: uppercase;
+    }
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 70px 70px 80px;
+      padding: 10px 24px;
+      border-bottom: 1px solid #1a1a1a;
+      align-items: center;
+    }
+    .table-row:last-child {
+      border-bottom: none;
+    }
+    .table-title {
+      font-family: 'Caveat', cursive;
+      font-size: 13px;
+      color: #ccc;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .table-cell {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #555;
+    }
+    .empty-message {
+      padding: 20px 24px;
+      text-align: center;
+      color: #555;
+      font-size: 13px;
+    }
+    /* RSS footer */
+    .rss-footer {
+      margin: 14px 24px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .rss-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #444;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .rss-url-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .rss-url {
+      flex: 1;
+      height: 28px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-copy {
+      padding: 4px 10px;
+      height: 28px;
+      font-size: 12px;
+      background: #1a1a1a;
+      border: 2px solid #1a1a1a;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      background: #2a2a2a;
+      border-color: #2a2a2a;
+    }
+    .rss-link {
+      font-family: 'Caveat', cursive;
+      font-size: 12px;
+      color: #3a88cc;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .rss-link:hover {
+      text-decoration: underline;
+    }
+    .feedback {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2a2a2a;
+      color: #3aaa3a;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .feedback.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">🎙 YouTube Podcast</div>
+      <div class="header-subtitle">Convertisseur YouTube → RSS</div>
+    </div>
+
+    <!-- Input row -->
+    <div class="input-row">
+      <input type="text" class="url-input" id="urlInput" placeholder="https://youtube.com/watch?v=..." />
+      <button class="btn" id="addBtn">Ajouter</button>
+    </div>
+
+    <!-- Status -->
+    <div class="status" id="status" style="display: none;"></div>
+
+    <!-- Table -->
+    <div id="tableContainer">
+      {% if episodes %}
+        <div class="table-header">
+          <div>Titre</div>
+          <div>Durée</div>
+          <div>Date</div>
+          <div>Actions</div>
+        </div>
+        {% for ep in episodes %}
+          <div class="table-row">
+            <div class="table-title">{{ ep.title }}</div>
+            <div class="table-cell">{{ ep.duration }}</div>
+            <div class="table-cell">{{ ep.date }}</div>
+            <button class="btn btn-small" onclick="deleteEpisode({{ ep.id }})">Supprimer</button>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-message">Colle une URL YouTube pour commencer</div>
+      {% endif %}
+    </div>
+
+    <!-- RSS footer -->
+    <div class="rss-footer">
+      <div class="rss-label">Flux RSS</div>
+      <div class="rss-url-row">
+        <div class="rss-url" id="rssUrl">{{ rss_url }}</div>
+        <button class="btn-copy" id="copyBtn">Copier</button>
+      </div>
+      <div>
+        🎧 <a href="pocketcasts://subscribe?url={{ rss_url }}" class="rss-link">Ouvrir dans Pocket Casts</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const addBtn = document.getElementById('addBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const status = document.getElementById('status');
+    const feedback = document.getElementById('feedback');
+
+    addBtn.addEventListener('click', () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        showStatus('Colle une URL YouTube', true);
+        return;
+      }
+      showStatus('Conversion en cours…');
+      // Simulate async operation
+      setTimeout(() => {
+        showStatus('✓ Conversion terminée — épiso ajouté');
+        urlInput.value = '';
+      }, 2000);
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const rssUrl = document.getElementById('rssUrl');
+      navigator.clipboard.writeText(rssUrl.textContent).then(() => {
+        showFeedback('✓ URL copiée');
+      });
+    });
+
+    function showStatus(msg, isError = false) {
+      status.textContent = isError ? '✗ ' + msg : msg;
+      status.className = isError ? 'status error' : 'status';
+      status.style.display = 'block';
+    }
+
+    function showFeedback(msg) {
+      feedback.textContent = msg;
+      feedback.classList.add('show');
+      setTimeout(() => feedback.classList.remove('show'), 2000);
+    }
+
+    function deleteEpisode(id) {
+      if (confirm('Supprimer cet épisode ?')) {
+        showFeedback('Épisode supprimé');
+        // API call would go here
+      }
+    }
+  </script>
+</body>
+</html>
