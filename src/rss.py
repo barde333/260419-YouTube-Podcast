@@ -10,6 +10,8 @@ PODCAST_TITLE = os.environ.get("PODCAST_TITLE", "My YouTube Podcast")
 PODCAST_DESC = os.environ.get("PODCAST_DESCRIPTION", "YouTube videos converted to audio")
 PODCAST_LANG = os.environ.get("PODCAST_LANGUAGE", "fr")
 PODCAST_AUTHOR = os.environ.get("PODCAST_AUTHOR", "Anonymous")
+PODCAST_OWNER_EMAIL = os.environ.get("PODCAST_OWNER_EMAIL", "owner@example.com")
+PODCAST_CATEGORY = os.environ.get("PODCAST_CATEGORY", "Technology")
 
 ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
@@ -33,7 +35,12 @@ def build_rss() -> str:
     itunes = lambda tag, val: _text(channel, f"itunes:{tag}", val)
     itunes("author", PODCAST_AUTHOR)
     itunes("explicit", "no")
+    itunes("summary", PODCAST_DESC)
     SubElement(channel, "itunes:image", href=f"{PUBLIC_URL}/static/cover.png")
+    SubElement(channel, "itunes:category", text=PODCAST_CATEGORY)
+    owner = SubElement(channel, "itunes:owner")
+    _text(owner, "itunes:name", PODCAST_AUTHOR)
+    _text(owner, "itunes:email", PODCAST_OWNER_EMAIL)
 
     for row in rows:
         item = SubElement(channel, "item")

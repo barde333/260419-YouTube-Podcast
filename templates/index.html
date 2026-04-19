@@ -287,18 +287,38 @@
     const status = document.getElementById('status');
     const feedback = document.getElementById('feedback');
 
-    addBtn.addEventListener('click', () => {
-      const url = urlInput.value.trim();
-      if (!url) {
-        showStatus('Colle une URL YouTube', true);
-        return;
+    function getApiKey() {
+      let k = localStorage.getItem('apiKey');
+      if (!k) {
+        k = prompt('Clé API:');
+        if (k) localStorage.setItem('apiKey', k);
       }
-      showStatus('Conversion en cours…');
-      // Simulate async operation
-      setTimeout(() => {
-        showStatus('✓ Conversion terminée — épiso ajouté');
+      return k;
+    }
+
+    addBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      if (!url) { showStatus('Colle une URL YouTube', true); return; }
+      const key = getApiKey();
+      if (!key) return;
+      showStatus('Envoi…');
+      try {
+        const r = await fetch('/api/episodes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          body: JSON.stringify({ url })
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          if (r.status === 401) localStorage.removeItem('apiKey');
+          showStatus(data.error || 'Erreur', true);
+          return;
+        }
+        showStatus(data.duplicate ? '✓ Déjà présent' : '✓ Conversion en cours — recharge la page dans 1–2 min');
         urlInput.value = '';
-      }, 2000);
+      } catch (e) {
+        showStatus('Erreur réseau', true);
+      }
     });
 
     copyBtn.addEventListener('click', () => {
@@ -320,10 +340,20 @@
       setTimeout(() => feedback.classList.remove('show'), 2000);
     }
 
-    function deleteEpisode(id) {
-      if (confirm('Supprimer cet épisode ?')) {
-        showFeedback('Épisode supprimé');
-        // API call would go here
+    async function deleteEpisode(id) {
+      if (!confirm('Supprimer cet épisode ?')) return;
+      const key = getApiKey();
+      if (!key) return;
+      const r = await fetch('/api/episodes/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      if (r.ok) {
+        showFeedback('✓ Épisode supprimé');
+        setTimeout(() => location.reload(), 800);
+      } else {
+        if (r.status === 401) localStorage.removeItem('apiKey');
+        showFeedback('✗ Erreur');
       }
     }
   </script>
