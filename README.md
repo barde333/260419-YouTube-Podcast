@@ -1,36 +1,36 @@
 # YouTube Podcast Converter
 
-Convertit des vidéos YouTube en MP3 et les sert via un flux RSS compatible avec Pocket Casts sur iPhone.
+Converts YouTube videos to MP3 and serves them as an iTunes-compatible RSS feed for Pocket Casts on iPhone.
 
-## Vue d'ensemble
+## Overview
 
-- **Backend** : Flask API + SQLite
-- **Audio** : yt-dlp + ffmpeg
-- **Flux** : RSS 2.0 standard iTunes
-- **Hébergement** : Docker sur serveur personnel
-- **URL publique** : `https://podcast.bard3.duckdns.org`
+- **Backend**: Flask API + SQLite
+- **Audio**: yt-dlp + ffmpeg
+- **Feed**: RSS 2.0 with iTunes namespace
+- **Hosting**: Docker on a personal server
+- **Public URL**: `https://podcast.bard3.duckdns.org`
 
-## Démarrage rapide
+## Quick Start
 
 ```bash
-cp .env.example .env   # puis renseigner API_KEY et PUBLIC_URL
+cp .env.example .env   # fill in API_KEY and PUBLIC_URL
 docker compose up -d
 ```
 
 ## API
 
-| Méthode | Route | Auth | Description |
-|---------|-------|------|-------------|
-| GET | `/health` | — | Santé du service |
-| GET | `/` | — | Interface web |
-| GET | `/feed.rss` | — | Flux RSS (Pocket Casts) |
-| GET | `/api/episodes` | — | Liste des épisodes |
-| POST | `/api/episodes` | Bearer | Ajouter une URL YouTube |
-| DELETE | `/api/episodes/<id>` | Bearer | Supprimer un épisode |
-| GET | `/add?url=...&key=...` | key param | Raccourci iPhone / bookmarklet |
-| GET | `/bookmarklet` | — | Page d'aide raccourcis |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/health` | — | Service health check |
+| GET | `/` | — | Web interface |
+| GET | `/feed.rss` | — | RSS feed (Pocket Casts) |
+| GET | `/api/episodes` | — | List episodes |
+| POST | `/api/episodes` | Bearer | Add a YouTube URL |
+| DELETE | `/api/episodes/<id>` | Bearer | Delete an episode |
+| GET | `/add?url=...&key=...` | key param | iPhone shortcut / bookmarklet |
+| GET | `/bookmarklet` | — | Shortcut help page |
 
-### Exemple — ajouter une vidéo
+### Example — add a video
 
 ```bash
 curl -X POST https://podcast.bard3.duckdns.org/api/episodes \
@@ -39,94 +39,94 @@ curl -X POST https://podcast.bard3.duckdns.org/api/episodes \
   -d '{"url": "https://youtube.com/watch?v=..."}'
 ```
 
-## Structure
+## Project Structure
 
 ```
 .
 ├── src/
-│   ├── app.py          # Flask : routes + auth
-│   ├── database.py     # Init SQLite
-│   ├── converter.py    # yt-dlp + ffmpeg (tâche de fond)
-│   ├── rss.py          # Générateur RSS iTunes
-│   └── wsgi.py         # Point d'entrée Gunicorn
+│   ├── app.py          # Flask: routes + auth
+│   ├── database.py     # SQLite init
+│   ├── converter.py    # yt-dlp + ffmpeg (background task)
+│   ├── rss.py          # iTunes RSS generator
+│   └── wsgi.py         # Gunicorn entry point
 ├── templates/
-│   ├── index.html      # Interface web
+│   ├── index.html      # Web interface
 │   └── bookmarklet.html
-├── data/               # Volume Docker : SQLite + MP3
+├── data/               # Docker volume: SQLite + MP3
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .env.example
 └── requirements.txt
 ```
 
-## Variables d'environnement
+## Environment Variables
 
-Voir [.env.example](.env.example). Variables principales :
+See [.env.example](.env.example). Key variables:
 
-| Variable | Valeur par défaut | Description |
-|----------|-------------------|-------------|
-| `API_KEY` | — | Clé Bearer pour endpoints protégés |
-| `DB_PATH` | `/data/podcast.db` | Chemin base SQLite |
-| `MEDIA_DIR` | `/data/media` | Dossier MP3 |
-| `PUBLIC_URL` | — | URL publique du service |
-| `MAX_WORKERS` | `2` | Conversions simultanées |
-| `YT_DLP_COOKIES_FILE` | — | Cookies pour contourner les 403 |
-
----
-
-## Progression Pathfinder
-
-### ✅ Étape 1 — Squelette du projet + garde-fous GitHub
-- Structure `src/`, `data/`, `.gitignore`, `.env.example`
-- Git repo initialisé, aucun secret committé
-
-### ✅ Étape 2 — Backend Flask minimal (endpoints + SQLite)
-- Table `videos` : id, youtube_url, video_id, title, filename, duration, filesize, status, created_at, converted_at
-- Routes : `GET /health`, `GET|POST /api/videos`, `DELETE /api/videos/<id>`, `GET /media/<file>`
-- Déduplication par `video_id`
-
-### ✅ Étape 3 — Moteur de conversion YouTube → MP3
-- `converter.py` : tâche de fond (thread daemon) avec sémaphore `MAX_WORKERS`
-- yt-dlp + ffmpeg : MP3 192K, miniature intégrée, métadonnées
-- Support cookies (`YT_DLP_COOKIES_FILE`) pour contourner les HTTP 403
-- Statuts : `pending` → `converting` → `done` / `error: ...`
-
-### ✅ Étape 4 — Générateur de flux RSS
-- `rss.py` : RSS 2.0 + namespace `itunes:` (compatible Pocket Casts)
-- Épisodes filtrés sur `status='done'`, triés par date de conversion
-- Champs : `<enclosure>` MP3, `<itunes:duration>`, `<pubDate>` RFC 2822
-
-### ✅ Étape 5 — Page web minimaliste
-- Interface dark mode CSS vanilla
-- Tableau épisodes (titre, durée, date, suppression)
-- Champ URL YouTube + bouton Ajouter
-- Section RSS avec copie d'URL et lien Pocket Casts
-
-### ✅ Étape 6 — Sécurité : clé API
-- Décorateur `@require_api_key` (Bearer token)
-- Routes protégées : `POST /api/episodes`, `DELETE /api/episodes/<id>`
-- Routes publiques : `GET /api/episodes`, `GET /feed.rss`, `GET /`
-
-### ✅ Étape 7 — Dockerisation
-- `Dockerfile` : python:3.11-slim + ffmpeg, Gunicorn 2 workers
-- `docker-compose.yml` : volume persistant `/opt/podcastyt/data`, port bindé sur `192.168.2.64:5000`
-- `.dockerignore` inclus
-
-### ✅ Étape 8 — Déploiement sur le serveur
-- Container `podcastyt` actif sur CT 103 (`192.168.2.64`)
-- Cert Let's Encrypt émis pour `podcast.bard3.duckdns.org` (via NPM)
-- HTTPS forcé — `https://podcast.bard3.duckdns.org/health` ✓
-
-### ✅ Étape 9 — Raccourci iPhone + Bookmarklet desktop
-- Endpoint `/add?url=...&key=...` pour URL handler (iOS Shortcuts + navigateur)
-- Page `/bookmarklet` : instructions drag-and-drop
-
-### ✅ Étape 10 — Tests de bout en bout
-- Parcours complet validé : URL YouTube → yt-dlp → MP3 → SQLite → flux RSS → Pocket Casts iPhone
-- Câblage final du backend (les routes `/feed.rss`, `POST /api/episodes`, `DELETE`, `/add` utilisaient des données mock ; désormais connectées à la DB et au converter)
-- Flux RSS enrichi avec `<itunes:category>` et `<itunes:owner>` (requis par Pocket Casts pour valider l'abonnement)
-- Route `/media/<filename>` ajoutée pour servir les MP3 aux clients podcast
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `API_KEY` | — | Bearer token for protected endpoints |
+| `DB_PATH` | `/data/podcast.db` | SQLite database path |
+| `MEDIA_DIR` | `/data/media` | MP3 storage directory |
+| `PUBLIC_URL` | — | Public URL of the service |
+| `MAX_WORKERS` | `2` | Concurrent conversions |
+| `YT_DLP_COOKIES_FILE` | — | Cookies file to bypass HTTP 403 |
 
 ---
 
-**Roadmap détaillée** : [PATHFINDER.md](PATHFINDER.md)
+## Pathfinder Progress
+
+### ✅ Step 1 — Project skeleton + GitHub guardrails
+- `src/`, `data/` structure, `.gitignore`, `.env.example`
+- Git repo initialised, no secrets committed
+
+### ✅ Step 2 — Minimal Flask backend (endpoints + SQLite)
+- Table `videos`: id, youtube_url, video_id, title, filename, duration, filesize, status, created_at, converted_at
+- Routes: `GET /health`, `GET|POST /api/videos`, `DELETE /api/videos/<id>`, `GET /media/<file>`
+- Deduplication by `video_id`
+
+### ✅ Step 3 — YouTube → MP3 conversion engine
+- `converter.py`: background daemon thread with `MAX_WORKERS` semaphore
+- yt-dlp + ffmpeg: MP3 192K, embedded thumbnail, metadata
+- Cookie support (`YT_DLP_COOKIES_FILE`) to bypass HTTP 403
+- Statuses: `pending` → `converting` → `done` / `error: ...`
+
+### ✅ Step 4 — RSS feed generator
+- `rss.py`: RSS 2.0 + `itunes:` namespace (Pocket Casts compatible)
+- Episodes filtered on `status='done'`, sorted by conversion date
+- Fields: `<enclosure>` MP3, `<itunes:duration>`, `<pubDate>` RFC 2822
+
+### ✅ Step 5 — Minimal web interface
+- Dark mode, vanilla CSS
+- Episode table (title, duration, date, delete)
+- YouTube URL input + Add button
+- RSS section with copy URL and Pocket Casts link
+
+### ✅ Step 6 — Security: API key
+- `@require_api_key` decorator (Bearer token)
+- Protected routes: `POST /api/episodes`, `DELETE /api/episodes/<id>`
+- Public routes: `GET /api/episodes`, `GET /feed.rss`, `GET /`
+
+### ✅ Step 7 — Dockerisation
+- `Dockerfile`: python:3.11-slim + ffmpeg, Gunicorn 2 workers
+- `docker-compose.yml`: persistent volume `/opt/podcastyt/data`, port bound to `192.168.2.64:5000`
+- `.dockerignore` included
+
+### ✅ Step 8 — Server deployment
+- Container `podcastyt` running on CT 103 (`192.168.2.64`)
+- Let's Encrypt cert issued for `podcast.bard3.duckdns.org` (via NPM)
+- HTTPS enforced — `https://podcast.bard3.duckdns.org/health` ✓
+
+### ✅ Step 9 — iPhone shortcut + desktop bookmarklet
+- `/add?url=...&key=...` endpoint for iOS Shortcuts and browser URL handler
+- `/bookmarklet` page: drag-and-drop instructions
+
+### ✅ Step 10 — End-to-end testing
+- Full flow validated: YouTube URL → yt-dlp → MP3 → SQLite → RSS feed → Pocket Casts iPhone
+- Final backend wiring (routes previously using mock data now connected to DB and converter)
+- RSS feed enriched with `<itunes:category>` and `<itunes:owner>` (required by Pocket Casts for feed validation)
+- `/media/<filename>` route added to serve MP3 files to podcast clients
+
+---
+
+**Detailed roadmap**: [PATHFINDER.md](PATHFINDER.md)
