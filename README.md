@@ -98,7 +98,7 @@ See [.env.example](.env.example). Key variables:
 
 ### ✅ Step 5 — Minimal web interface
 - Dark mode, vanilla CSS
-- Episode table (title, duration, date, delete)
+- Episode table (title, duration, date, delete) with placeholders for pending/converting/error states
 - YouTube URL input + Add button
 - RSS section with copy URL and Pocket Casts link
 

@@ -57,12 +57,23 @@ def row_to_public(row):
         dur_str = f"{h}h{m:02d}" if h else f"{m}:{s:02d}"
     else:
         dur_str = '—'
+    status = row['status'] or ''
+    if status == 'done':
+        title = row['title'] or row['video_id']
+    elif status == 'pending':
+        title = 'En attente…'
+    elif status == 'converting':
+        title = 'Conversion en cours…'
+    elif status.startswith('error'):
+        title = f'⚠ Erreur : {status[6:].lstrip(": ").strip() or "inconnue"}'
+    else:
+        title = row['title'] or row['video_id']
     return {
         'id': row['id'],
-        'title': row['title'] or row['video_id'],
+        'title': title,
         'duration': dur_str,
         'date': date,
-        'status': row['status'],
+        'status': status,
     }
 
 
