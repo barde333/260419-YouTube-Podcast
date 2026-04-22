@@ -54,7 +54,9 @@ def build_rss() -> str:
         enc.set("type", "audio/mpeg")
         enc.set("length", str(row["filesize"] or 0))
 
-        _text(item, "guid", mp3_url)
+        guid_val = f"{mp3_url}#{row['converted_at']}" if row["converted_at"] else mp3_url
+        guid_el = _text(item, "guid", guid_val)
+        guid_el.set("isPermaLink", "false")
         _text(item, "link", row["youtube_url"])
         _text(item, "pubDate", _to_rfc2822(row["converted_at"]))
         _text(item, "itunes:author", PODCAST_AUTHOR)
