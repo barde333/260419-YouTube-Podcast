@@ -52,12 +52,17 @@ On configure un raccourci iOS (app Raccourcis Apple) qui apparaît dans le menu 
 - **Tokens estimés :** ~1 000
 - **Modèle :** Haiku
 
-## 10. ⏳ Tests de bout en bout et abonnement Pocket Casts
+## 10. ✅ Tests de bout en bout et abonnement Pocket Casts
 On teste le parcours complet : URL YouTube → MP3 dispo → flux RSS à jour → Pocket Casts s'abonne et lit l'épisode. On ajuste les derniers détails (titre, image de podcast, métadonnées).
 - **Tokens estimés :** ~1 500
 - **Modèle :** Haiku
 
+## 11. ✅ Retrait de la clé API (usage perso simplifié)
+On supprime la protection par Bearer token sur les routes d'ajout/suppression : plus de `prompt()` qui demande la clé sur mobile, plus de `localStorage` qui saute avec Safari iOS ITP. L'app devient utilisable directement sur n'importe quel appareil. Risque résiduel accepté (projet perso, URL non diffusée).
+- **Tokens estimés :** ~1 000
+- **Modèle :** Haiku
+
 ---
 
-**Total estimé :** ~20 500 tokens
-**Répartition modèle :** Haiku ~40% · Sonnet ~60% · Opus 0%
+**Total estimé :** ~21 500 tokens
+**Répartition modèle :** Haiku ~45% · Sonnet ~55% · Opus 0%

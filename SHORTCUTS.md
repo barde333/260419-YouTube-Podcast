@@ -18,7 +18,6 @@ Créez un nouveau raccourci dans l'app Raccourcis Apple qui envoie l'URL YouTube
       - URL: https://podcast.bard3.duckdns.org/api/episodes
       - Méthode: POST
       - En-têtes:
-         Authorization: Bearer YOUR_API_KEY
          Content-Type: application/json
       - Corps: {"url": [Presse-papiers]}
       - Type de contenu: JSON
@@ -44,7 +43,7 @@ Créez un nouveau raccourci dans l'app Raccourcis Apple qui envoie l'URL YouTube
 
 ## 📱 Bookmarklet Desktop
 
-Sauvegardez ce code comme un marque-page dans votre navigateur.
+Sauvegardez ce code comme un marque-page dans votre navigateur. Vous pouvez aussi le trouver sur `/bookmarklet`.
 
 ### Chrome/Safari/Firefox :
 
@@ -63,7 +62,6 @@ javascript:(function(){
   fetch('https://podcast.bard3.duckdns.org/api/episodes', {
     method: 'POST',
     headers: {
-      'Authorization': 'Bearer YOUR_API_KEY',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ url })
@@ -80,15 +78,3 @@ javascript:(function(){
 2. Cliquer le marque-page "Ajouter au Podcast"
 3. Coller l'URL → OK
 4. Confirmation dans l'alerte ✓
-
----
-
-## 🔐 Configuration
-
-Remplacez `YOUR_API_KEY` par votre vraie clé API dans les deux raccourcis.
-
-Pour le raccourci iOS, vous pouvez aussi utiliser un URL handler :
-```
-https://podcast.bard3.duckdns.org/add?url=YOUTUBE_URL&key=YOUR_API_KEY
-```
-(À implémenter côté backend pour plus de fluidité)

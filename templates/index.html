@@ -292,30 +292,18 @@
     const status = document.getElementById('status');
     const feedback = document.getElementById('feedback');
 
-    function getApiKey() {
-      let k = localStorage.getItem('apiKey');
-      if (!k) {
-        k = prompt('Clé API:');
-        if (k) localStorage.setItem('apiKey', k);
-      }
-      return k;
-    }
-
     addBtn.addEventListener('click', async () => {
       const url = urlInput.value.trim();
       if (!url) { showStatus('Colle une URL YouTube', true); return; }
-      const key = getApiKey();
-      if (!key) return;
       showStatus('Envoi…');
       try {
         const r = await fetch('/api/episodes', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url })
         });
         const data = await r.json();
         if (!r.ok) {
-          if (r.status === 401) localStorage.removeItem('apiKey');
           showStatus(data.error || 'Erreur', true);
           return;
         }
@@ -347,17 +335,13 @@
 
     async function deleteEpisode(id) {
       if (!confirm('Supprimer cet épisode ?')) return;
-      const key = getApiKey();
-      if (!key) return;
       const r = await fetch('/api/episodes/' + id, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + key }
+        method: 'DELETE'
       });
       if (r.ok) {
         showFeedback('✓ Épisode supprimé');
         setTimeout(() => location.reload(), 800);
       } else {
-        if (r.status === 401) localStorage.removeItem('apiKey');
         showFeedback('✗ Erreur');
       }
     }

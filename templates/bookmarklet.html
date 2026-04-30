@@ -114,26 +114,14 @@
       <h2>📱 Bookmark (Drag & Drop)</h2>
       <p>Faites glisser le bouton ci-dessous dans votre barre de marque-pages :</p>
       <div class="drag-target">
-        <a href="javascript:(function(){const u=prompt('URL YouTube:');if(!u)return;const k=prompt('API Key:');fetch('{{ public_url }}/api/episodes',{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:JSON.stringify({url:u})}).then(r=>r.json()).then(d=>alert('✓ Ajouté')).catch(e=>alert('✗ '+e.message))})();" 
+        <a href="javascript:(function(){const u=prompt('URL YouTube:');if(!u)return;fetch('{{ public_url }}/api/episodes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u})}).then(r=>r.json()).then(d=>alert('✓ Ajouté')).catch(e=>alert('✗ '+e.message))})();"
            draggable="true">
           ➕ Ajouter au Podcast
         </a>
       </div>
       <div class="instructions">
-        <strong>Utilisation :</strong> Cliquez sur le bookmark quand vous êtes sur YouTube, entrez la clé API, et l'URL est ajoutée.
+        <strong>Utilisation :</strong> Cliquez sur le bookmark quand vous êtes sur YouTube et l'URL est ajoutée directement.
       </div>
-    </div>
-
-    <div class="card">
-      <h2>🔗 URL Handler (Plus fluide)</h2>
-      <p>Utilisez cet URL pattern pour une intégration plus douce :</p>
-      <div class="bookmarklet-box">
-        https://{{ domain }}/add?url=YOUTUBE_URL&key=API_KEY
-      </div>
-      <p style="color: #555; font-size: 12px;">
-        Exemple: <br>
-        <code style="color: #3a88cc;">https://{{ domain }}/add?url=https://youtube.com/watch?v=abc&key=YOUR_API_KEY</code>
-      </p>
     </div>
 
     <div class="card">

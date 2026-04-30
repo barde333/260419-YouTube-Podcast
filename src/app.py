@@ -1,6 +1,5 @@
 import os
 import re
-from functools import wraps
 from urllib.parse import urlparse, parse_qs
 
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
@@ -12,20 +11,10 @@ from converter import enqueue
 init_db()
 
 app = Flask(__name__, template_folder='../templates')
-API_KEY = os.getenv('API_KEY', 'dev-key-change-in-production')
 MEDIA_DIR = os.environ.get("MEDIA_DIR", "/data/media")
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:5000").rstrip("/")
 
 
-def require_api_key(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        auth_header = request.headers.get('Authorization', '')
-        token = auth_header.replace('Bearer ', '') if auth_header.startswith('Bearer ') else None
-        if not token or token != API_KEY:
-            return jsonify({'error': 'Unauthorized'}), 401
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 def extract_video_id(url: str):
@@ -130,7 +119,6 @@ def _add_url(url: str):
 
 
 @app.route('/api/episodes', methods=['POST'])
-@require_api_key
 def add_episode():
     data = request.get_json(silent=True) or {}
     url = data.get('url')
@@ -141,7 +129,6 @@ def add_episode():
 
 
 @app.route('/api/episodes/<int:episode_id>', methods=['DELETE'])
-@require_api_key
 def delete_episode(episode_id):
     with get_conn() as conn:
         row = conn.execute("SELECT filename FROM videos WHERE id=?", (episode_id,)).fetchone()
@@ -156,17 +143,6 @@ def delete_episode(episode_id):
         except FileNotFoundError:
             pass
     return jsonify({'status': 'deleted'}), 200
-
-
-@app.route('/add', methods=['GET'])
-def add_via_url():
-    url = request.args.get('url')
-    key = request.args.get('key')
-    if not url or key != API_KEY:
-        return 'Invalid URL or API key', 400
-    body, code = _add_url(url)
-    msg = 'Ajout en cours' if code == 201 else ('Déjà présent' if body.get('duplicate') else 'Erreur')
-    return f'<html><body style="font-family:sans-serif;padding:20px"><h2>✓ {msg}</h2><p>YouTube: {url}</p><p>Statut: {body.get("status")}</p><script>setTimeout(()=>window.close(),2000)</script></body></html>'
 
 
 @app.route('/media/<path:filename>')

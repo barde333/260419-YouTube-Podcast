@@ -13,7 +13,7 @@ Converts YouTube videos to MP3 and serves them as an iTunes-compatible RSS feed 
 ## Quick Start
 
 ```bash
-cp .env.example .env   # fill in API_KEY and PUBLIC_URL
+cp .env.example .env   # fill in PUBLIC_URL
 docker compose up -d
 ```
 
@@ -25,16 +25,14 @@ docker compose up -d
 | GET | `/` | — | Web interface |
 | GET | `/feed.rss` | — | RSS feed (Pocket Casts) |
 | GET | `/api/episodes` | — | List episodes |
-| POST | `/api/episodes` | Bearer | Add a YouTube URL |
-| DELETE | `/api/episodes/<id>` | Bearer | Delete an episode |
-| GET | `/add?url=...&key=...` | key param | iPhone shortcut / bookmarklet |
+| POST | `/api/episodes` | — | Add a YouTube URL |
+| DELETE | `/api/episodes/<id>` | — | Delete an episode |
 | GET | `/bookmarklet` | — | Shortcut help page |
 
 ### Example — add a video
 
 ```bash
 curl -X POST https://podcast.bard3.duckdns.org/api/episodes \
-  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://youtube.com/watch?v=..."}'
 ```
@@ -65,7 +63,6 @@ See [.env.example](.env.example). Key variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `API_KEY` | — | Bearer token for protected endpoints |
 | `DB_PATH` | `/data/podcast.db` | SQLite database path |
 | `MEDIA_DIR` | `/data/media` | MP3 storage directory |
 | `PUBLIC_URL` | — | Public URL of the service |
@@ -103,9 +100,8 @@ See [.env.example](.env.example). Key variables:
 - RSS section with copy URL and Pocket Casts link
 
 ### ✅ Step 6 — Security: API key
-- `@require_api_key` decorator (Bearer token)
-- Protected routes: `POST /api/episodes`, `DELETE /api/episodes/<id>`
-- Public routes: `GET /api/episodes`, `GET /feed.rss`, `GET /`
+- Bearer token authentication initially implemented
+- Simplified in Step 11 for personal usage
 
 ### ✅ Step 7 — Dockerisation
 - `Dockerfile`: python:3.11-slim + ffmpeg, Gunicorn 2 workers
@@ -118,14 +114,20 @@ See [.env.example](.env.example). Key variables:
 - HTTPS enforced — `https://podcast.bard3.duckdns.org/health` ✓
 
 ### ✅ Step 9 — iPhone shortcut + desktop bookmarklet
-- `/add?url=...&key=...` endpoint for iOS Shortcuts and browser URL handler
-- `/bookmarklet` page: drag-and-drop instructions
+- Browser bookmarklet via `/bookmarklet` page: drag-and-drop instructions
+- iOS Shortcuts app for iPhone share integration
 
 ### ✅ Step 10 — End-to-end testing
 - Full flow validated: YouTube URL → yt-dlp → MP3 → SQLite → RSS feed → Pocket Casts iPhone
 - Final backend wiring (routes previously using mock data now connected to DB and converter)
 - RSS feed enriched with `<itunes:category>` and `<itunes:owner>` (required by Pocket Casts for feed validation)
 - `/media/<filename>` route added to serve MP3 files to podcast clients
+
+### ✅ Step 11 — API key removal (simplified personal use)
+- Bearer token authentication removed from `POST /api/episodes` and `DELETE /api/episodes/<id>`
+- No more `prompt()` dialogs on mobile or Safari localStorage issues
+- Direct web interface and bookmarklet usage without credentials
+- `/add` endpoint removed (URL handler pattern deprecated)
 
 ---
 
