@@ -94,7 +94,7 @@ See [.env.example](.env.example). Key variables:
 - Fields: `<enclosure>` MP3, `<itunes:duration>`, `<pubDate>` RFC 2822
 
 ### ✅ Step 5 — Minimal web interface
-- Dark mode, vanilla CSS
+- Light theme, vanilla CSS (DM Sans font)
 - Episode table (title, duration, date, delete) with placeholders for pending/converting/error states
 - YouTube URL input + Add button
 - RSS section with copy URL and Pocket Casts link
