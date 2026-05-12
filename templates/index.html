@@ -109,7 +109,7 @@
     /* Table */
     .table-header {
       display: grid;
-      grid-template-columns: 1fr 70px 70px 80px;
+      grid-template-columns: 1fr 70px 80px;
       padding: 8px 24px;
       border-bottom: 1px solid #eee;
       background: #fafafa;
@@ -120,7 +120,7 @@
     }
     .table-row {
       display: grid;
-      grid-template-columns: 1fr 70px 70px 80px;
+      grid-template-columns: 1fr 70px 80px;
       padding: 10px 24px;
       border-bottom: 1px solid #f0f0f0;
       align-items: center;
@@ -254,14 +254,12 @@
         <div class="table-header">
           <div>Titre</div>
           <div>Durée</div>
-          <div>Date</div>
           <div>Actions</div>
         </div>
         {% for ep in episodes %}
           <div class="table-row">
             <div class="table-title">{{ ep.title }}</div>
             <div class="table-cell">{{ ep.duration }}</div>
-            <div class="table-cell">{{ ep.date }}</div>
             <button class="btn btn-small" onclick="deleteEpisode({{ ep.id }})">Supprimer</button>
           </div>
         {% endfor %}
